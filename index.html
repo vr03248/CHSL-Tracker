@@ -1,0 +1,2248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>SSC CHSL 47-Day Progress Tracker &amp; Video Study Planner</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom animations and scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(100, 116, 139, 0.1);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.35);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.55);
+    }
+    .check-bounce {
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .check-bounce:active {
+      transform: scale(0.85);
+    }
+    /* iOS Safari input zoom prevention and touch handling */
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+      input[type="text"], textarea {
+        font-size: 16px !important;
+      }
+    }
+    html {
+      -webkit-tap-highlight-color: transparent;
+      scroll-behavior: smooth;
+    }
+    /* Print optimization */
+    @media print {
+      header, #phaseFilterContainer, #searchInput, #clearSearchBtn, .tag-quick-filter,
+      #openResetBtn, #exportBtn, #importBtn, #themeToggle, footer, #emptyState, #toast, #confirmModal {
+        display: none !important;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      .day-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #cbd5e1 !important;
+        margin-bottom: 1rem !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans antialiased transition-colors duration-200">
+
+  <!-- TOP NOTIFICATION / TOAST MODAL (Alert replacement) -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-120%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium"></div>
+
+  <!-- CONFIRMATION MODAL (alert/confirm replacement) -->
+  <div id="confirmModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" id="modalBox">
+      <div class="flex items-center gap-3 text-rose-500 mb-3">
+        <div class="p-2.5 bg-rose-100 dark:bg-rose-950/50 rounded-xl">
+          <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white" id="modalTitle">Reset All Progress?</h3>
+      </div>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 leading-relaxed" id="modalMessage">
+        This will wipe out all checked tasks, daily notes, and mock records. This action cannot be undone.
+      </p>
+      <div class="flex items-center justify-end gap-3">
+        <button id="cancelModalBtn" class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition">
+          Cancel
+        </button>
+        <button id="confirmModalBtn" class="px-5 py-2 text-sm font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-sm transition">
+          Confirm Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="border-b border-slate-200 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Info -->
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
+          <i data-lucide="target" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              SSC CHSL 47-Day Tracker
+            </h1>
+            <span class="text-xs px-2 py-0.5 rounded-full font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+              Tier 1 • 2026
+            </span>
+            <span class="hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-medium bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+              <i data-lucide="play-circle" class="w-3 h-3"></i> YouTube Lectures Linked
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            Teacher Schedule • Afternoon &amp; Evening Study Engine
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Actions (Timer, Theme, Export, Import, Reset) -->
+      <div class="flex items-center gap-2 ml-auto flex-wrap sm:flex-nowrap">
+        <!-- Live Countdown Pill -->
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono">
+          <i data-lucide="clock" class="w-4 h-4 text-amber-500 animate-pulse"></i>
+          <span class="text-slate-500 dark:text-slate-400 hidden xs:inline">Exam In:</span>
+          <span id="countdownDisplay" class="font-bold text-slate-900 dark:text-amber-400">Loading...</span>
+        </div>
+
+        <!-- Hidden File Input for JSON Restore -->
+        <input type="file" id="importFileInput" accept=".json" class="hidden">
+
+        <!-- Import / Restore Data -->
+        <button id="importBtn" title="Restore progress from JSON backup" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" aria-label="Import Data">
+          <i data-lucide="upload" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Export Data -->
+        <button id="exportBtn" title="Export progress report as JSON" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" aria-label="Export Data">
+          <i data-lucide="download" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Reset Button -->
+        <button id="openResetBtn" title="Reset all progress" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-slate-200 dark:border-slate-700 transition" aria-label="Reset All Progress">
+          <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Dark/Light Mode Toggle -->
+        <button id="themeToggle" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition" aria-label="Toggle Theme">
+          <i data-lucide="moon" class="w-4 h-4 hidden dark:block"></i>
+          <i data-lucide="sun" class="w-4 h-4 block dark:hidden"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- GLOBAL PROGRESS & HERO STATS -->
+    <section class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      
+      <!-- Primary Progress Card -->
+      <div class="lg:col-span-2 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-950 text-white rounded-2xl p-6 shadow-xl relative overflow-hidden flex flex-col justify-between border border-indigo-900/50">
+        <div class="absolute -right-8 -bottom-8 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs uppercase font-bold tracking-widest text-indigo-300">Overall Master Progress</span>
+            <span id="progressPercentage" class="text-2xl font-black font-mono text-emerald-400">0%</span>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-800/80 rounded-full h-3.5 p-0.5 border border-slate-700/60 overflow-hidden mb-4">
+            <div id="mainProgressBar" class="h-full bg-gradient-to-r from-indigo-500 via-sky-400 to-emerald-400 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+          <div>
+            <span class="text-slate-400 block text-[11px]">Tasks Done</span>
+            <span id="tasksStat" class="font-bold text-sm text-slate-100 font-mono">0 / 141</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Days Completed</span>
+            <span id="daysCompletedStat" class="font-bold text-sm text-emerald-400 font-mono">0 / 47</span>
+          </div>
+          <div>
+            <span class="text-slate-400 block text-[11px]">Active Streak</span>
+            <span id="streakStat" class="font-bold text-sm text-amber-300 font-mono">🔥 0 Days</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat Card 2: Current Phase Tracker -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Phase</span>
+          <span id="activePhaseBadge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">Phase 1</span>
+        </div>
+        <div class="my-3">
+          <h3 id="activePhaseTitle" class="text-base font-bold text-slate-900 dark:text-white">Core Foundations</h3>
+          <p id="activePhaseDesc" class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+            Arithmetic core, High-frequency English grammar rules, and Polity/History basics.
+          </p>
+        </div>
+        <div class="text-xs font-mono text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex justify-between items-center">
+          <span>Target Period</span>
+          <span class="text-slate-700 dark:text-slate-300 font-medium">14 Oct – 07 Nov</span>
+        </div>
+      </div>
+
+      <!-- Stat Card 3: Daily Routine Schedule Card (Collapsible) -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Working Routine</span>
+          <span class="text-[11px] font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> 4h 15m daily
+          </span>
+        </div>
+        <div class="space-y-2 my-2 text-xs">
+          <div class="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+            <span class="font-semibold text-slate-700 dark:text-slate-200">Afternoon</span>
+            <span class="font-mono text-slate-500 dark:text-slate-400">1:45 PM – 2:45 PM (1h)</span>
+          </div>
+          <div class="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+            <span class="font-semibold text-slate-700 dark:text-slate-200">Evening Quant</span>
+            <span class="font-mono text-slate-500 dark:text-slate-400">6:30 PM – 8:30 PM (2h)</span>
+          </div>
+          <div class="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+            <span class="font-semibold text-slate-700 dark:text-slate-200">Night Wrap</span>
+            <span class="font-mono text-slate-500 dark:text-slate-400">9:30 PM – 10:45 PM (1.25h)</span>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400 italic">No mornings. 5:30–6:30 PM tea &amp; mind recharge.</p>
+      </div>
+
+    </section>
+
+    <!-- SUBJECT-WISE PROGRESS TRACKER -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Subject-Wise Syllabus Coverage
+            </h3>
+            <p class="text-[11px] text-slate-400">Real-time progress across all 5 syllabus domains</p>
+          </div>
+        </div>
+        <span class="text-[11px] text-slate-400 font-medium hidden sm:inline">Tap any subject to filter</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1" id="subjectStatsContainer">
+        <!-- English -->
+        <button class="subject-card text-left p-3 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-100/60 dark:hover:bg-rose-900/30 transition group cursor-pointer" data-tag="ENG">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-rose-700 dark:text-rose-300">English</span>
+            <span id="subj_ENG_pct" class="text-xs font-bold font-mono text-rose-600 dark:text-rose-400">0%</span>
+          </div>
+          <div class="w-full bg-rose-200/60 dark:bg-rose-900/40 rounded-full h-1.5 overflow-hidden mb-1.5">
+            <div id="subj_ENG_bar" class="h-full bg-rose-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="subj_ENG_count" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">0 / 19 tasks</span>
+        </button>
+
+        <!-- Quant -->
+        <button class="subject-card text-left p-3 rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-100/60 dark:hover:bg-blue-900/30 transition group cursor-pointer" data-tag="QUAN">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-blue-700 dark:text-blue-300">Quant (Maths)</span>
+            <span id="subj_QUAN_pct" class="text-xs font-bold font-mono text-blue-600 dark:text-blue-400">0%</span>
+          </div>
+          <div class="w-full bg-blue-200/60 dark:bg-blue-900/40 rounded-full h-1.5 overflow-hidden mb-1.5">
+            <div id="subj_QUAN_bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="subj_QUAN_count" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">0 / 46 tasks</span>
+        </button>
+
+        <!-- Reasoning -->
+        <button class="subject-card text-left p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-100/60 dark:hover:bg-amber-900/30 transition group cursor-pointer" data-tag="REAS">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-amber-700 dark:text-amber-300">Reasoning</span>
+            <span id="subj_REAS_pct" class="text-xs font-bold font-mono text-amber-600 dark:text-amber-400">0%</span>
+          </div>
+          <div class="w-full bg-amber-200/60 dark:bg-amber-900/40 rounded-full h-1.5 overflow-hidden mb-1.5">
+            <div id="subj_REAS_bar" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="subj_REAS_count" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">0 / 19 tasks</span>
+        </button>
+
+        <!-- General Awareness -->
+        <button class="subject-card text-left p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/30 transition group cursor-pointer" data-tag="GK">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">GK &amp; CA</span>
+            <span id="subj_GK_pct" class="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400">0%</span>
+          </div>
+          <div class="w-full bg-emerald-200/60 dark:bg-emerald-900/40 rounded-full h-1.5 overflow-hidden mb-1.5">
+            <div id="subj_GK_bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="subj_GK_count" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">0 / 42 tasks</span>
+        </button>
+
+        <!-- Mocks & Revision -->
+        <button class="subject-card col-span-2 sm:col-span-1 text-left p-3 rounded-xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/40 dark:bg-purple-950/20 hover:bg-purple-100/60 dark:hover:bg-purple-900/30 transition group cursor-pointer" data-tag="MOCK">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-bold text-purple-700 dark:text-purple-300">Mocks &amp; Rev</span>
+            <span id="subj_MOCK_pct" class="text-xs font-bold font-mono text-purple-600 dark:text-purple-400">0%</span>
+          </div>
+          <div class="w-full bg-purple-200/60 dark:bg-purple-900/40 rounded-full h-1.5 overflow-hidden mb-1.5">
+            <div id="subj_MOCK_bar" class="h-full bg-purple-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="subj_MOCK_count" class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">0 / 15 tasks</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- CONTROLS & FILTER BAR -->
+    <section class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        
+        <!-- Phase Filter Tabs -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none" id="phaseFilterContainer">
+          <button data-filter="all" class="phase-btn active px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition bg-slate-900 text-white dark:bg-indigo-600">
+            All Days (47)
+          </button>
+          <button data-filter="phase1" class="phase-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Phase 1: Foundations (1–25)
+          </button>
+          <button data-filter="phase2" class="phase-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Phase 2: Advance (26–40)
+          </button>
+          <button data-filter="phase3" class="phase-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Phase 3: Final Mocks (41–47)
+          </button>
+          <button data-filter="today" id="todayFilterBtn" class="phase-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span> Today's Focus
+          </button>
+        </div>
+
+        <!-- Search / Topic Filter -->
+        <div class="relative min-w-[240px]">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input 
+            type="text" 
+            id="searchInput"
+            placeholder="Search topic, chapter, educator, mock..." 
+            class="w-full pl-9 pr-8 py-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400 transition"
+          >
+          <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs p-1" title="Clear search">
+            ✕
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Subject Badges Filter -->
+      <div class="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800/60 text-xs text-slate-500 overflow-x-auto">
+        <span class="font-medium text-slate-400 whitespace-nowrap text-[11px]">Quick Tag:</span>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 text-[11px] font-medium" data-tag="ALL">All Subjects</button>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 text-[11px] font-medium" data-tag="ENG">English</button>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40 text-[11px] font-medium" data-tag="QUAN">Quant</button>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40 text-[11px] font-medium" data-tag="REAS">Reasoning</button>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900/40 text-[11px] font-medium" data-tag="GK">GK / CA</button>
+        <button class="tag-quick-filter px-2.5 py-1 rounded-md bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-900/40 text-[11px] font-medium" data-tag="MOCK">Mocks</button>
+      </div>
+    </section>
+
+    <!-- 47-DAY CARDS GRID -->
+    <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Dynamic Day Cards will render here -->
+    </div>
+
+    <!-- Empty State for Searches -->
+    <div id="emptyState" class="hidden text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">
+      <div class="h-12 w-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mb-3">
+        <i data-lucide="search-x" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-sm font-semibold text-slate-900 dark:text-white">No days match your filter</h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Try clearing the search query or phase filter.</p>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs text-slate-500 dark:text-slate-400 py-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div>
+        <p class="font-medium text-slate-700 dark:text-slate-300">SSC CHSL 47-Day Dedicated Study Planner &amp; Video Engine</p>
+        <p class="text-[11px] text-slate-400">All data automatically stored in your browser's local storage • Complete YouTube learning lectures linked.</p>
+      </div>
+      <div class="flex items-center gap-4 text-[11px] justify-center sm:justify-end">
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Completed</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-400"></span> In Progress</span>
+        <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-slate-200 dark:bg-slate-700"></span> Pending</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // --- 47-DAY COMPLETE DATA ENGINE WITH YOUTUBE LEARNING LINKS ---
+    const PLAN_DATA = [
+  {
+    "day": 1,
+    "dateStr": "14 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Noun & Pronoun Rules + 30 Qs Practice",
+      "videoUrl": "https://www.youtube.com/watch?v=IDBcnBoO7nE",
+      "videoLabel": "\u25b6 Watch Lecture: Noun & Pronoun Rules (SSC English)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Percentage Basics & Fraction-to-% Conversion",
+      "videoUrl": "https://www.youtube.com/watch?v=n1pkXvbYYzI",
+      "videoLabel": "\u25b6 Watch Lecture: Percentage Part-01 (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Articles 1\u201351A (FR & Duties) + Quick Rev",
+      "videoUrl": "https://www.youtube.com/watch?v=KttjPidVxSY",
+      "videoLabel": "\u25b6 Watch Lecture: Articles 1\u201351A & FR (Parmar SSC)"
+    }
+  },
+  {
+    "day": 2,
+    "dateStr": "15 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Number Series & Alphabet Series Drills",
+      "videoUrl": "https://www.youtube.com/watch?v=3CfeAjE5ZNY",
+      "videoLabel": "\u25b6 Watch Lecture: Number & Alphabet Series (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Percentage Advanced Tricks + 40 PYQs",
+      "videoUrl": "https://www.youtube.com/watch?v=Vm4jkAtxSRg",
+      "videoLabel": "\u25b6 Watch Lecture: Percentage Tricks & 40 PYQs (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "President, PM & Parliament Overview",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+polity+president+pm+parliament+parmar+ssc",
+      "videoLabel": "\u25b6 Learn Topic: President, PM & Parliament (Parmar SSC)"
+    }
+  },
+  {
+    "day": 3,
+    "dateStr": "16 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Subject-Verb Agreement Golden Rules",
+      "videoUrl": "https://www.youtube.com/watch?v=7FWOB_QJES8",
+      "videoLabel": "\u25b6 Watch Lecture: Subject-Verb Agreement Golden Rules (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Ratio & Proportion Concepts & Shortcuts",
+      "videoUrl": "https://www.youtube.com/watch?v=bAs_0tocxJ4",
+      "videoLabel": "\u25b6 Watch Lecture: Ratio & Proportion Concepts (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Important Constitutional Amendments & Schedules",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+constitutional+amendments+schedules+parmar+ssc",
+      "videoLabel": "\u25b6 Learn Topic: Constitutional Amendments & Schedules (Parmar SSC)"
+    }
+  },
+  {
+    "day": 4,
+    "dateStr": "17 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Coding-Decoding (Alphabet & Number patterns)",
+      "videoUrl": "https://www.youtube.com/watch?v=Ju0Mk46wZno",
+      "videoLabel": "\u25b6 Watch Lecture: Coding-Decoding Class 1 (Piyush Varshney Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Ratio, Mixture & Alligation Methods",
+      "videoUrl": "https://www.youtube.com/watch?v=goD7jwJbosw",
+      "videoLabel": "\u25b6 Watch Lecture: Mixture & Alligation Methods (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "January 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+january+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: Jan 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 5,
+    "dateStr": "18 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Verb, Tenses & Conditional Sentence Rules",
+      "videoUrl": "https://www.youtube.com/watch?v=cPbuhxWMlMM",
+      "videoLabel": "\u25b6 Watch Lecture: Verbs, Tenses & Conditionals (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Profit, Loss & Discount (Part 1 - Basics)",
+      "videoUrl": "https://www.youtube.com/watch?v=I_0L5HnWgOc",
+      "videoLabel": "\u25b6 Watch Lecture: Profit & Loss Part-01 Basics (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "January 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+january+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: Jan 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 6,
+    "dateStr": "19 Oct 2026",
+    "phase": 1,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Week 1 Error Notebook Catch-up & Rules Rev",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+english+grammar+golden+rules+revision",
+      "videoLabel": "\u25b6 Revision Drill: Week 1 Error Catch-up & Grammar Rules"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "50 Mixed Arithmetic PYQ Speed Sprint",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+50+arithmetic+pyq+speed+sprint+aditya+ranjan",
+      "videoLabel": "\u25b6 Speed Sprint: 50 Mixed Arithmetic PYQs (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Mock Test 1 (Tier 1 Full 60m) + Analysis",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+1+analysis+live",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Tier 1 Full 60m Test 1"
+    }
+  },
+  {
+    "day": 7,
+    "dateStr": "20 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Analogy & Classification (Word & Num)",
+      "videoUrl": "https://www.youtube.com/watch?v=zypQbPR8RJg",
+      "videoLabel": "\u25b6 Watch Lecture: Analogy & Classification (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Profit, Loss & Marked Price (Part 2)",
+      "videoUrl": "https://www.youtube.com/watch?v=AI8e3tonqNc",
+      "videoLabel": "\u25b6 Watch Lecture: Profit, Loss & Marked Price (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Indus Valley Civilization & Vedic Period",
+      "videoUrl": "https://www.youtube.com/watch?v=UcSh5Is8XNM",
+      "videoLabel": "\u25b6 Watch Lecture: Indus Valley Civilization & Vedic Age (Parmar SSC)"
+    }
+  },
+  {
+    "day": 8,
+    "dateStr": "21 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Adjective & Adverb Placement Rules",
+      "videoUrl": "https://www.youtube.com/watch?v=lrFr2rSj-2M",
+      "videoLabel": "\u25b6 Watch Lecture: Adjectives & Adverbs Placement Rules (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Simple Interest Formulas & Shortcuts",
+      "videoUrl": "https://www.youtube.com/watch?v=aTt0n_jWfTU",
+      "videoLabel": "\u25b6 Watch Lecture: Simple Interest Formulas & Tricks (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Buddhism, Jainism & Maurya Empire",
+      "videoUrl": "https://www.youtube.com/watch?v=qYIGU6B15e0",
+      "videoLabel": "\u25b6 Watch Lecture: Buddhism, Jainism & Maurya Empire (Parmar SSC)"
+    }
+  },
+  {
+    "day": 9,
+    "dateStr": "22 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Syllogisms (Statements, Conclusions & Venn)",
+      "videoUrl": "https://www.youtube.com/watch?v=Fep4O4mU05E",
+      "videoLabel": "\u25b6 Watch Lecture: Complete Syllogisms Reasoning (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Compound Interest & SI-CI Difference Hacks",
+      "videoUrl": "https://www.youtube.com/watch?v=MAJmiRcjwxg",
+      "videoLabel": "\u25b6 Watch Lecture: Compound Interest & Difference Hacks (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Delhi Sultanate & Mughal Architecture",
+      "videoUrl": "https://www.youtube.com/watch?v=vltd8M3P5FA",
+      "videoLabel": "\u25b6 Watch Lecture: Delhi Sultanate & Mughal Architecture (Parmar SSC)"
+    }
+  },
+  {
+    "day": 10,
+    "dateStr": "23 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Prepositions & High-Frequency Phrasal Verbs",
+      "videoUrl": "https://www.youtube.com/watch?v=jEFQAMs9y4E",
+      "videoLabel": "\u25b6 Watch Lecture: Prepositions & Phrasal Verbs (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "SI & CI Mixed Level 2 Questions",
+      "videoUrl": "https://www.youtube.com/watch?v=Zk7u-zbkqj0",
+      "videoLabel": "\u25b6 Practice Session: SI & CI Mixed Level 2 Questions (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "1857 Revolt & Indian National Movement",
+      "videoUrl": "https://www.youtube.com/watch?v=hbPnbV8DX5M",
+      "videoLabel": "\u25b6 Watch Lecture: 1857 Revolt & National Movement (Parmar SSC)"
+    }
+  },
+  {
+    "day": 11,
+    "dateStr": "24 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Blood Relations (Family Tree & Coded)",
+      "videoUrl": "https://www.youtube.com/watch?v=6uUWbFxxWys",
+      "videoLabel": "\u25b6 Watch Lecture: Blood Relations New Pattern (Piyush Varshney Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Time and Work (Efficiency Method)",
+      "videoUrl": "https://www.youtube.com/watch?v=iXzJxeOGZZ0",
+      "videoLabel": "\u25b6 Watch Lecture: Time and Work Efficiency Method (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "February 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+february+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: Feb 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 12,
+    "dateStr": "25 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Conjunctions & Modal Auxiliaries",
+      "videoUrl": "https://www.youtube.com/watch?v=NY_KBQnrSsU",
+      "videoLabel": "\u25b6 Watch Lecture: Conjunctions & Modal Auxiliaries (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Pipes and Cisterns Basics & PYQs",
+      "videoUrl": "https://www.youtube.com/watch?v=dShCSiEVBlI",
+      "videoLabel": "\u25b6 Watch Lecture: Pipes and Cisterns Basics & PYQs (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "February 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+february+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: Feb 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 13,
+    "dateStr": "26 Oct 2026",
+    "phase": 1,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Grammar Golden Rules Comprehensive Revision",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+english+grammar+golden+rules+marathon+rani+mam",
+      "videoLabel": "\u25b6 Marathon: Comprehensive Grammar Golden Rules (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Time/Work + Pipes Marathon (40 Qs)",
+      "videoUrl": "https://www.youtube.com/watch?v=iadnbEFtFeo",
+      "videoLabel": "\u25b6 Practice Marathon: Time/Work & Pipes 40 Qs (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Mock Test 2 (Tier 1 Full 60m) + Error Log",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+2+live+attempt",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Tier 1 Full 60m Test 2"
+    }
+  },
+  {
+    "day": 14,
+    "dateStr": "27 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Direction & Distance Logic & Turns",
+      "videoUrl": "https://www.youtube.com/watch?v=fWXDLkkVgzk",
+      "videoLabel": "\u25b6 Watch Lecture: Direction & Distance Logic & Turns (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Speed, Distance & Time Fundamentals",
+      "videoUrl": "https://www.youtube.com/watch?v=LAbe-NWI0Ro",
+      "videoLabel": "\u25b6 Watch Lecture: Speed, Distance & Time Fundamentals (SSC Maths)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Indian River Systems & Major Dams",
+      "videoUrl": "https://www.youtube.com/watch?v=6LjqpYTs-UA",
+      "videoLabel": "\u25b6 Watch Lecture: Indian River Systems & Major Dams (Parmar SSC)"
+    }
+  },
+  {
+    "day": 15,
+    "dateStr": "28 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Active & Passive Voice (Part 1 - Rules)",
+      "videoUrl": "https://www.youtube.com/watch?v=MfF4fkXGa1Q",
+      "videoLabel": "\u25b6 Watch Lecture: Active & Passive Voice Part 1 Rules (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Trains & Relative Speed Concepts",
+      "videoUrl": "https://www.youtube.com/watch?v=_yWeFaflfR4",
+      "videoLabel": "\u25b6 Watch Lecture: Trains & Relative Speed Concepts (Time Speed Distance)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Indian Soils, Mountains & National Parks",
+      "videoUrl": "https://www.youtube.com/watch?v=DNhyZ22THvA",
+      "videoLabel": "\u25b6 Watch Lecture: Indian Soils, Mountains & National Parks (Parmar SSC)"
+    }
+  },
+  {
+    "day": 16,
+    "dateStr": "29 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Order & Ranking Arrangements",
+      "videoUrl": "https://www.youtube.com/watch?v=v3kUIl8l9ts",
+      "videoLabel": "\u25b6 Watch Lecture: Order & Ranking Arrangements (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Boats & Streams (Upstream/Downstream)",
+      "videoUrl": "https://www.youtube.com/watch?v=TJDxb2gmRQQ",
+      "videoLabel": "\u25b6 Watch Lecture: Boats & Streams Concepts (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Solar System, Climate & Latitudes",
+      "videoUrl": "https://www.youtube.com/watch?v=T-OlSX6Uycg",
+      "videoLabel": "\u25b6 Watch Lecture: Solar System, Climate & Latitudes (Parmar SSC)"
+    }
+  },
+  {
+    "day": 17,
+    "dateStr": "30 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Active & Passive Voice (Part 2 - Practice)",
+      "videoUrl": "https://www.youtube.com/watch?v=0M_TRliuBkc",
+      "videoLabel": "\u25b6 Practice Session: Active & Passive Voice Part 2 PYQs (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Averages & Weighted Averages Shortcuts",
+      "videoUrl": "https://www.youtube.com/watch?v=QEREdrQsOM4",
+      "videoLabel": "\u25b6 Watch Lecture: Averages & Weighted Averages Shortcuts (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "March 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+march+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: March 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 18,
+    "dateStr": "31 Oct 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Paper Folding, Cutting & Cube Dice",
+      "videoUrl": "https://www.youtube.com/watch?v=uzIGgQ8Udro",
+      "videoLabel": "\u25b6 Watch Lecture: Paper Folding, Cutting & Cube Dice (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Partnership & Age Problems",
+      "videoUrl": "https://www.youtube.com/watch?v=7O7kEeMR8nc",
+      "videoLabel": "\u25b6 Watch Lecture: Partnership & Age Problems (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "March 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+march+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: March 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 19,
+    "dateStr": "01 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Direct & Indirect Speech (Part 1 - Rules)",
+      "videoUrl": "https://www.youtube.com/watch?v=u2cCHVWJTQ0",
+      "videoLabel": "\u25b6 Watch Lecture: Direct & Indirect Speech Part 1 Rules (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Divisibility Rules & Remainder Theorem",
+      "videoUrl": "https://www.youtube.com/watch?v=am506zNdL8Q",
+      "videoLabel": "\u25b6 Watch Lecture: Divisibility Rules & Remainder Theorem (Number System)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Classical & Folk Dances of India, Festivals",
+      "videoUrl": "https://www.youtube.com/watch?v=SD0YPZgxitE",
+      "videoLabel": "\u25b6 Watch Lecture: Classical & Folk Dances, Festivals (Parmar SSC)"
+    }
+  },
+  {
+    "day": 20,
+    "dateStr": "02 Nov 2026",
+    "phase": 1,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Vocab & Idioms Flashcard Drill",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+vocab+idioms+flashcards+rapid+fire+rani+mam",
+      "videoLabel": "\u25b6 Speed Drill: High-Yield Vocab & Idioms Flashcards (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Speed Math, Tables & Calculation Tricks",
+      "videoUrl": "https://www.youtube.com/results?search_query=speed+math+calculation+tricks+tables+aditya+ranjan",
+      "videoLabel": "\u25b6 Speed Math: Calculation Hacks & Multiplication Tricks"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Mock Test 3 (Tier 1 Full 60m) + Analysis",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+3+analysis+live",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Tier 1 Full 60m Test 3"
+    }
+  },
+  {
+    "day": 21,
+    "dateStr": "03 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Mirror & Water Images, Embedded Figures",
+      "videoUrl": "https://www.youtube.com/watch?v=rVtohHnROvU",
+      "videoLabel": "\u25b6 Watch Lecture: Mirror & Water Images, Embedded Figures (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Unit Digit, LCM & HCF Tricks",
+      "videoUrl": "https://www.youtube.com/watch?v=pfrB_F2uQ7A",
+      "videoLabel": "\u25b6 Watch Lecture: Unit Digit, LCM & HCF Tricks (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "UNESCO World Heritage Sites & Monuments",
+      "videoUrl": "https://www.youtube.com/watch?v=M7Tsy8xDZdY",
+      "videoLabel": "\u25b6 Watch Lecture: UNESCO World Heritage Sites & Monuments (Parmar SSC)"
+    }
+  },
+  {
+    "day": 22,
+    "dateStr": "04 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Direct & Indirect Speech (Part 2 - PYQs)",
+      "videoUrl": "https://www.youtube.com/watch?v=RMZt3m-C3T4",
+      "videoLabel": "\u25b6 Practice Session: Direct & Indirect Speech PYQs (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Algebra: Algebraic Identities & Formulas",
+      "videoUrl": "https://www.youtube.com/watch?v=wZhO8Ggz2KQ",
+      "videoLabel": "\u25b6 Watch Lecture: Algebra Algebraic Identities & Formulas (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Biology: Cell Structure, Human Body, Vitamins",
+      "videoUrl": "https://www.youtube.com/watch?v=PSoL_URbbrk",
+      "videoLabel": "\u25b6 Watch Lecture: Biology Cell Structure & Human Body (Parmar SSC)"
+    }
+  },
+  {
+    "day": 23,
+    "dateStr": "05 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Venn Diagrams & Missing Number Patterns",
+      "videoUrl": "https://www.youtube.com/watch?v=rakKZFIe9EM",
+      "videoLabel": "\u25b6 Watch Lecture: Venn Diagrams & Missing Number Patterns (Piyush Varshney Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Algebra: Polynomials & Factorization",
+      "videoUrl": "https://www.youtube.com/watch?v=dttmHxNU_7Y",
+      "videoLabel": "\u25b6 Watch Lecture: Algebra Polynomials & Factorization (Gagan Pratap Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Chemistry: Chemical Names, Periodic Table",
+      "videoUrl": "https://www.youtube.com/watch?v=SiQIkhi_nas",
+      "videoLabel": "\u25b6 Watch Lecture: Chemistry Periodic Table & Compounds (Parmar SSC)"
+    }
+  },
+  {
+    "day": 24,
+    "dateStr": "06 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Idioms & Phrases (Top 150 PYQs)",
+      "videoUrl": "https://www.youtube.com/watch?v=dq7d8xPBwlU",
+      "videoLabel": "\u25b6 High-Yield Session: Top 150 Idioms & Phrases PYQs (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Linear & Quadratic Equation Basics",
+      "videoUrl": "https://www.youtube.com/watch?v=cvLOTJ6Wt8A",
+      "videoLabel": "\u25b6 Watch Lecture: Linear & Quadratic Equation Basics (Concept King)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Physics: Optics, Motion, Units & Measurements",
+      "videoUrl": "https://www.youtube.com/watch?v=0I5Gj6W2ElU",
+      "videoLabel": "\u25b6 Watch Lecture: Physics Optics, Motion & Units (Parmar SSC)"
+    }
+  },
+  {
+    "day": 25,
+    "dateStr": "07 Nov 2026",
+    "phase": 1,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Mathematical Operations & Dicework",
+      "videoUrl": "https://www.youtube.com/watch?v=cY6doi4xxJA",
+      "videoLabel": "\u25b6 Watch Lecture: Mathematical Operations & Dicework (Vikramjeet Sir)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "40 Algebra PYQs (CHSL/CGL Level)",
+      "videoUrl": "https://www.youtube.com/watch?v=SPPbgDg9dOU",
+      "videoLabel": "\u25b6 Practice Session: 40 Algebra Tough PYQs (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "April 2026 Current Affairs (Full Capsule)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+april+2026+current+affairs+full+capsule",
+      "videoLabel": "\u25b6 Monthly Capsule: April 2026 Current Affairs"
+    }
+  },
+  {
+    "day": 26,
+    "dateStr": "08 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "One Word Substitution (Top 150 High-Yield)",
+      "videoUrl": "https://www.youtube.com/watch?v=DWtZhiREy5A",
+      "videoLabel": "\u25b6 High-Yield Session: Top 150 One Word Substitution (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Geometry: Lines, Angles & Triangles",
+      "videoUrl": "https://www.youtube.com/watch?v=jk41EVi_wsI",
+      "videoLabel": "\u25b6 Watch Lecture: Geometry Lines, Angles & Triangles (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "May 2026 Current Affairs (Full Capsule)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+may+2026+current+affairs+full+capsule",
+      "videoLabel": "\u25b6 Monthly Capsule: May 2026 Current Affairs"
+    }
+  },
+  {
+    "day": 27,
+    "dateStr": "09 Nov 2026",
+    "phase": 2,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Formula Sheet Review + Triangle Centers",
+      "videoUrl": "https://www.youtube.com/results?search_query=geometry+triangle+centers+centroid+incenter+formula+revision",
+      "videoLabel": "\u25b6 Formula Revision: Triangle Centers & Geometry Properties"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Triangle Congruence & Similarity 40 Qs",
+      "videoUrl": "https://www.youtube.com/watch?v=ZOQ9fkzIh3I",
+      "videoLabel": "\u25b6 Practice Session: Triangle Congruence & Similarity 40 Qs (Gagan Pratap Sir)"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Mock Test 4 (Tier 1 Full 60m) + Analysis",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+4+analysis+live",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Tier 1 Full 60m Test 4"
+    }
+  },
+  {
+    "day": 28,
+    "dateStr": "10 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 1 (25 Qs with Timer)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+sectional+test+1+timer+practice",
+      "videoLabel": "\u25b6 Timed Test: Reasoning Sectional Test 1 (25 Qs with Timer)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Geometry: Circles, Chords & Tangents",
+      "videoUrl": "https://www.youtube.com/watch?v=OGiVb6sjSWQ",
+      "videoLabel": "\u25b6 Watch Lecture: Geometry Circles, Chords & Tangents (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Five Year Plans, Inflation & RBI Basics",
+      "videoUrl": "https://www.youtube.com/watch?v=vZvckhklhZU",
+      "videoLabel": "\u25b6 Watch Lecture: Five Year Plans, Inflation & RBI Basics (Parmar SSC)"
+    }
+  },
+  {
+    "day": 29,
+    "dateStr": "11 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Sectional Test 1 (25 Qs with Timer)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+english+sectional+test+1+25+questions+with+timer",
+      "videoLabel": "\u25b6 Timed Test: English Sectional Test 1 (25 Qs with Timer)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Geometry: Quadrilaterals & Regular Polygons",
+      "videoUrl": "https://www.youtube.com/watch?v=JGl2ETKFcx0",
+      "videoLabel": "\u25b6 Watch Lecture: Geometry Quadrilaterals & Regular Polygons (Gagan Pratap Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Census 2011 Data + Govt Schemes 2026",
+      "videoUrl": "https://www.youtube.com/watch?v=LfP1KwOlhYQ",
+      "videoLabel": "\u25b6 Watch Lecture: Census 2011 Data & Govt Schemes (Parmar SSC)"
+    }
+  },
+  {
+    "day": 30,
+    "dateStr": "12 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 2 (25 Qs with Timer)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+sectional+test+2+timer+practice",
+      "videoLabel": "\u25b6 Timed Test: Reasoning Sectional Test 2 (25 Qs with Timer)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Mensuration 2D (Area & Perimeter)",
+      "videoUrl": "https://www.youtube.com/watch?v=ccmkF8tQ7rQ",
+      "videoLabel": "\u25b6 Watch Lecture: Mensuration 2D Area & Perimeter (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "June 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+june+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: June 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 31,
+    "dateStr": "13 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Sectional Test 2 (25 Qs with Timer)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+english+sectional+test+2+25+questions+with+timer",
+      "videoLabel": "\u25b6 Timed Test: English Sectional Test 2 (25 Qs with Timer)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Mensuration 3D (Cylinder, Cone, Sphere)",
+      "videoUrl": "https://www.youtube.com/watch?v=nH6hS4Mr7L0",
+      "videoLabel": "\u25b6 Watch Lecture: Mensuration 3D Cylinder, Cone, Sphere (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "June 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+june+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: June 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 32,
+    "dateStr": "14 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 3 (25 Qs with Timer)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+sectional+test+3+timer+practice",
+      "videoLabel": "\u25b6 Timed Test: Reasoning Sectional Test 3 (25 Qs with Timer)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Trigonometry Ratios & Standard Angle Tables",
+      "videoUrl": "https://www.youtube.com/watch?v=nOH3AOZGExo",
+      "videoLabel": "\u25b6 Watch Lecture: Trigonometry Ratios & Angle Tables (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "July 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+july+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: July 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 33,
+    "dateStr": "15 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Cloze Test & Reading Comprehension Drills",
+      "videoUrl": "https://www.youtube.com/watch?v=-TR7nJu5Je8",
+      "videoLabel": "\u25b6 Practice Session: Cloze Test & RC Drills (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Trigonometric Identities & Max/Min Values",
+      "videoUrl": "https://www.youtube.com/watch?v=oHTJzCz8V-g",
+      "videoLabel": "\u25b6 Watch Lecture: Trigonometric Identities & Max/Min (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "July 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+july+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: July 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 34,
+    "dateStr": "16 Nov 2026",
+    "phase": 2,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Geometry & Mensuration Formula Notebook Rev",
+      "videoUrl": "https://www.youtube.com/results?search_query=geometry+mensuration+formula+revision+marathon+aditya+ranjan",
+      "videoLabel": "\u25b6 Formula Marathon: Geometry & Mensuration Notebook"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "50 Geometry & Trigonometry Mixed PYQs",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+50+geometry+trigonometry+pyqs+aditya+ranjan",
+      "videoLabel": "\u25b6 Practice Session: 50 Geometry & Trigonometry Mixed PYQs"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Mock Test 5 (Tier 1 Full 60m) + Analysis",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+5+analysis+live",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Tier 1 Full 60m Test 5"
+    }
+  },
+  {
+    "day": 35,
+    "dateStr": "17 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 4 (Target: under 14 min)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+speed+test+25+questions+14+min",
+      "videoLabel": "\u25b6 Speed Drill: Reasoning 25 Qs Under 14 Min"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Heights and Distances (Trigo Applications)",
+      "videoUrl": "https://www.youtube.com/watch?v=AWGYiX8k7j0",
+      "videoLabel": "\u25b6 Watch Lecture: Heights and Distances Applications (Aditya Ranjan Sir)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "August 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+august+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: August 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 36,
+    "dateStr": "18 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Spotting Errors Marathon (75 Questions)",
+      "videoUrl": "https://www.youtube.com/watch?v=o5imGxqRWoo",
+      "videoLabel": "\u25b6 Practice Marathon: Spotting Errors 75 Questions (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Data Interpretation: Tables & Bar Graphs",
+      "videoUrl": "https://www.youtube.com/watch?v=V9bQSWbH_Wk",
+      "videoLabel": "\u25b6 Watch Lecture: DI Tables & Bar Graphs (SSC Maths)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "August 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+august+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: August 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 37,
+    "dateStr": "19 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 5 (Target: under 14 min)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+sectional+test+5+14+min+drill",
+      "videoLabel": "\u25b6 Speed Drill: Reasoning Sectional Test 5 (Under 14 min)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Data Interpretation: Pie Charts & Line Graphs",
+      "videoUrl": "https://www.youtube.com/watch?v=ERoNJ1uQ4gE",
+      "videoLabel": "\u25b6 Watch Lecture: DI Pie Charts & Line Graphs (SSC Maths)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "September 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+september+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: September 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 38,
+    "dateStr": "20 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Sentence Improvement Marathon (75 Qs)",
+      "videoUrl": "https://www.youtube.com/watch?v=cPbuhxWMlMM",
+      "videoLabel": "\u25b6 Practice Marathon: Sentence Improvement 75 Qs (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Complete Arithmetic Formula Revision Sprint",
+      "videoUrl": "https://www.youtube.com/watch?v=vgZr0lRBEGg",
+      "videoLabel": "\u25b6 Complete Marathon: Arithmetic Formula Revision Sprint"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "September 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+september+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: September 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 39,
+    "dateStr": "21 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Sectional Test 6 (Target: under 14 min)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+sectional+test+6+timer+practice",
+      "videoLabel": "\u25b6 Speed Drill: Reasoning Sectional Test 6 (Under 14 min)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Complete Advance Maths Formula Sprint",
+      "videoUrl": "https://www.youtube.com/watch?v=g3IoculYbfI",
+      "videoLabel": "\u25b6 Complete Marathon: Advance Maths Formula Sprint"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "October 2026 Current Affairs (Part 1)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+october+2026+current+affairs+part+1",
+      "videoLabel": "\u25b6 Watch Class: October 2026 CA Marathon (Part 1)"
+    }
+  },
+  {
+    "day": 40,
+    "dateStr": "22 Nov 2026",
+    "phase": 2,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "Vocab, Idioms & Misspelled Words Speed Quiz",
+      "videoUrl": "https://www.youtube.com/watch?v=6OabsH8VQws",
+      "videoLabel": "\u25b6 Speed Quiz: Vocab, Idioms & Misspelled Words (Rani Ma'am)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "50 Mixed Tough PYQs (Time-bound)",
+      "videoUrl": "https://www.youtube.com/watch?v=2Chb4Ewf_k0",
+      "videoLabel": "\u25b6 Speed Practice: 50 Mixed Tough PYQs (Time-bound)"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "October 2026 Current Affairs (Part 2)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+october+2026+current+affairs+part+2",
+      "videoLabel": "\u25b6 Watch Class: October 2026 CA Marathon (Part 2)"
+    }
+  },
+  {
+    "day": 41,
+    "dateStr": "23 Nov 2026",
+    "phase": 3,
+    "isSunday": true,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Mock Test 6 (Strict Tier 1 60m Simulation)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+6+strict+60m+simulation",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Mock Test 6 (Strict 60m Simulation)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Deep Analysis: Section Time Management",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+tier+1+section+time+management+strategy",
+      "videoLabel": "\u25b6 Strategy Masterclass: Section Time Management & Skip Hacks"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Complete Polity & Modern History Short Notes",
+      "videoUrl": "https://www.youtube.com/watch?v=KttjPidVxSY",
+      "videoLabel": "\u25b6 Rapid Short Notes: Complete Polity & Modern History (Parmar SSC)"
+    }
+  },
+  {
+    "day": 42,
+    "dateStr": "24 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Reasoning Speed Drill: 25 Qs in 13 min",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+reasoning+speed+drill+25+questions+13+minutes",
+      "videoLabel": "\u25b6 Speed Drill: 25 Reasoning Questions in 13 Minutes"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Calculation Hacks, Squares (1-50), Cubes (1-30)",
+      "videoUrl": "https://www.youtube.com/results?search_query=maths+calculation+hacks+squares+1+to+50+cubes+1+to+30",
+      "videoLabel": "\u25b6 Calculation Hacks: Squares (1-50) & Cubes (1-30) Drill"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Top 100 Static GK Facts Rapid Recall",
+      "videoUrl": "https://www.youtube.com/watch?v=TsZ2ClB-vsM",
+      "videoLabel": "\u25b6 Rapid Recall: Top 100 Static GK Facts (Parmar SSC)"
+    }
+  },
+  {
+    "day": 43,
+    "dateStr": "25 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Mock Test 7 (Strict Tier 1 60m Simulation)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+tier+1+full+mock+test+7+strict+60m+simulation",
+      "videoLabel": "\u25b6 Mock Attempt & Analysis: Mock Test 7 (Strict 60m Simulation)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Refining 2-Round Skip Strategy for Traps",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+maths+exam+hall+skip+strategy+trap+questions",
+      "videoLabel": "\u25b6 Exam Tactics: 2-Round Skip Strategy for Traps & Speed"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Science Capsule: Rapid Revision of Ores & Diseases",
+      "videoUrl": "https://www.youtube.com/watch?v=jrWhJSGb0h8",
+      "videoLabel": "\u25b6 Science Capsule: Rapid Revision of Ores & Diseases (Parmar SSC)"
+    }
+  },
+  {
+    "day": 44,
+    "dateStr": "26 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "ENG",
+      "title": "100 Golden Rules of Grammar Rapid Review",
+      "videoUrl": "https://www.youtube.com/watch?v=PF6V01KVz_U",
+      "videoLabel": "\u25b6 Rapid Review: 100 Golden Rules of Grammar"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Formula Handbook: Complete Final Pass",
+      "videoUrl": "https://www.youtube.com/watch?v=w8H4BXlv5e8",
+      "videoLabel": "\u25b6 Complete Final Pass: Maths Formula Handbook Marathon"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Sports, Awards & Books/Authors 2026",
+      "videoUrl": "https://www.youtube.com/watch?v=AsFIaqU7TQI",
+      "videoLabel": "\u25b6 Quick Revision: Sports, Awards & Books/Authors 2026 (Parmar SSC)"
+    }
+  },
+  {
+    "day": 45,
+    "dateStr": "27 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "MOCK",
+      "title": "Mock Test 8 (Final Full Tier 1 Test)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+final+full+mock+test+8+exam+simulation",
+      "videoLabel": "\u25b6 Final Simulation: Mock Test 8 (Tier 1 Real Exam Atmosphere)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Final Error Notebook Review: Zero New Concepts",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+maths+error+notebook+final+review",
+      "videoLabel": "\u25b6 Error Notebook Pass: Zero New Concepts Review"
+    },
+    "slot3": {
+      "tag": "GK",
+      "title": "Last 6 Months Current Affairs One-Liners Read",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+last+6+months+current+affairs+one+liners",
+      "videoLabel": "\u25b6 Rapid One-Liners: Last 6 Months Current Affairs Revision"
+    }
+  },
+  {
+    "day": 46,
+    "dateStr": "28 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "REAS",
+      "title": "Light Warmup (No Score Pressure)",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+reasoning+light+warmup+easy+drills",
+      "videoLabel": "\u25b6 Warmup Session: Light Reasoning Warmup (Zero Stress)"
+    },
+    "slot2": {
+      "tag": "QUAN",
+      "title": "Tables, Pythagoras Triplets & Formulas Look",
+      "videoUrl": "https://www.youtube.com/results?search_query=pythagorean+triplets+maths+tables+formula+quick+glance",
+      "videoLabel": "\u25b6 Formulas & Triplets: Quick Memory Glance"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Admit Card, Original ID & Photos Packed",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+exam+hall+guidelines+admit+card+documents",
+      "videoLabel": "\u25b6 Checklist Video: SSC CHSL Admit Card, ID & Exam Hall Rules"
+    }
+  },
+  {
+    "day": 47,
+    "dateStr": "29 Nov 2026",
+    "phase": 3,
+    "isSunday": false,
+    "slot1": {
+      "tag": "GK",
+      "title": "Calm Mindset: Light Reading / Audio Walk",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+exam+day+mindset+calm+focus+guidance",
+      "videoLabel": "\u25b6 Calm Mindset: Light Reading & Mental Serenity Walk"
+    },
+    "slot2": {
+      "tag": "GK",
+      "title": "Strictly No Math Problem Solving \u2022 Relax",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+chsl+exam+day+strategy+time+management",
+      "videoLabel": "\u25b6 Exam Hall Strategy: Final Section Time Allocation Plan"
+    },
+    "slot3": {
+      "tag": "MOCK",
+      "title": "Sleep early by 10 PM. You Are Ready to Win!",
+      "videoUrl": "https://www.youtube.com/results?search_query=ssc+exam+last+day+motivation+you+will+crack+it",
+      "videoLabel": "\u25b6 Final Motivation: Sleep Early & Conquer Tier 1!"
+    }
+  }
+];
+
+    // LocalStorage Keys
+    const STORAGE_KEY_CHECKS = 'ssc_chsl_checked_tasks_v1';
+    const STORAGE_KEY_NOTES = 'ssc_chsl_day_notes_v1';
+    const STORAGE_KEY_THEME = 'ssc_chsl_theme_v1';
+
+    // Safe Storage Wrapper
+    function safeGetStorage(key, fallback) {
+      try {
+        const item = localStorage.getItem(key);
+        return item ? JSON.parse(item) : fallback;
+      } catch (e) {
+        console.warn('Storage read failed:', e);
+        return fallback;
+      }
+    }
+
+    function safeSetStorage(key, value) {
+      try {
+        localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+      } catch (e) {
+        console.warn('Storage write failed:', e);
+      }
+    }
+
+    // State
+    let taskState = safeGetStorage(STORAGE_KEY_CHECKS, {});
+    let notesState = safeGetStorage(STORAGE_KEY_NOTES, {});
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentTagFilter = 'ALL';
+
+    // Exam Date Target
+    const EXAM_DATE = new Date('2026-11-30T09:00:00+05:30');
+
+    // DOM Elements
+    const cardsContainer = document.getElementById('cardsContainer');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const mainProgressBar = document.getElementById('mainProgressBar');
+    const progressPercentage = document.getElementById('progressPercentage');
+    const tasksStat = document.getElementById('tasksStat');
+    const daysCompletedStat = document.getElementById('daysCompletedStat');
+    const streakStat = document.getElementById('streakStat');
+    const activePhaseBadge = document.getElementById('activePhaseBadge');
+    const activePhaseTitle = document.getElementById('activePhaseTitle');
+    const activePhaseDesc = document.getElementById('activePhaseDesc');
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    const toast = document.getElementById('toast');
+    const confirmModal = document.getElementById('confirmModal');
+    const importFileInput = document.getElementById('importFileInput');
+    const importBtn = document.getElementById('importBtn');
+
+    // Tag styles lookup
+    const TAG_CLASSES = {
+      ENG: "bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border-rose-200 dark:border-rose-900",
+      REAS: "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-900",
+      QUAN: "bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-200 dark:border-blue-900",
+      GK: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900",
+      MOCK: "bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border-purple-200 dark:border-purple-900 font-bold"
+    };
+
+    // Show Custom Toast (Non-alert)
+    let toastTimeout = null;
+    function showToast(message, type = 'success') {
+      clearTimeout(toastTimeout);
+      toast.className = `fixed top-5 right-5 z-50 transform translate-y-0 opacity-100 transition-all duration-300 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm font-medium ${
+        type === 'success' 
+          ? 'bg-emerald-500 text-white border-emerald-400' 
+          : 'bg-indigo-600 text-white border-indigo-500'
+      }`;
+      toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 shrink-0"></i> <span>${message}</span>`;
+      lucide.createIcons();
+      toastTimeout = setTimeout(() => {
+        toast.classList.replace('translate-y-0', 'translate-y-[-120%]');
+        toast.classList.replace('opacity-100', 'opacity-0');
+      }, 2600);
+    }
+
+    // Live Countdown
+    function updateCountdown() {
+      const now = new Date();
+      const diff = EXAM_DATE - now;
+
+      if (diff <= 0) {
+        countdownDisplay.textContent = "Exam Started / Active!";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / 1000 / 60) % 60);
+
+      countdownDisplay.textContent = `${days}d ${hours}h ${mins}m`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Helper: check if a day matches today
+    function getTodayDayNumber() {
+      const today = new Date();
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const dayNum = today.getDate();
+      const dayPadded = dayNum < 10 ? '0' + dayNum : '' + dayNum;
+      const monthStr = months[today.getMonth()];
+
+      const match = PLAN_DATA.find(d => {
+        return d.dateStr.includes(monthStr) && (d.dateStr.startsWith(dayPadded) || d.dateStr.startsWith(dayNum + ' '));
+      });
+      return match ? match.day : null;
+    }
+
+    // Calculate Streak Accurately
+    function calculateStreak() {
+      let maxStreak = 0;
+      let currentStreak = 0;
+      for (let i = 0; i < PLAN_DATA.length; i++) {
+        const day = PLAN_DATA[i].day;
+        const c1 = !!taskState[`d${day}_s1`];
+        const c2 = !!taskState[`d${day}_s2`];
+        const c3 = !!taskState[`d${day}_s3`];
+        if (c1 && c2 && c3) {
+          currentStreak++;
+          if (currentStreak > maxStreak) maxStreak = currentStreak;
+        } else {
+          currentStreak = 0;
+        }
+      }
+      return maxStreak;
+    }
+
+    // Update Global and Subject Progress
+    function updateProgress() {
+      const totalTasks = PLAN_DATA.length * 3; // 141 tasks
+      let completedTasks = 0;
+      let completedDays = 0;
+
+      // Subject tallies
+      const subjectTotals = { ENG: 0, QUAN: 0, REAS: 0, GK: 0, MOCK: 0 };
+      const subjectDone = { ENG: 0, QUAN: 0, REAS: 0, GK: 0, MOCK: 0 };
+
+      PLAN_DATA.forEach(item => {
+        const c1 = !!taskState[`d${item.day}_s1`];
+        const c2 = !!taskState[`d${item.day}_s2`];
+        const c3 = !!taskState[`d${item.day}_s3`];
+
+        if (c1) completedTasks++;
+        if (c2) completedTasks++;
+        if (c3) completedTasks++;
+
+        if (c1 && c2 && c3) completedDays++;
+
+        // Subject breakdown
+        subjectTotals[item.slot1.tag]++;
+        subjectTotals[item.slot2.tag]++;
+        subjectTotals[item.slot3.tag]++;
+
+        if (c1) subjectDone[item.slot1.tag]++;
+        if (c2) subjectDone[item.slot2.tag]++;
+        if (c3) subjectDone[item.slot3.tag]++;
+      });
+
+      const percentage = Math.round((completedTasks / totalTasks) * 100);
+      progressPercentage.textContent = `${percentage}%`;
+      mainProgressBar.style.width = `${percentage}%`;
+      tasksStat.textContent = `${completedTasks} / ${totalTasks}`;
+      daysCompletedStat.textContent = `${completedDays} / ${PLAN_DATA.length}`;
+
+      const streak = calculateStreak();
+      streakStat.textContent = `🔥 ${streak} ${streak === 1 ? 'Day' : 'Days'}`;
+
+      // Update Subject Progress widgets
+      ['ENG', 'QUAN', 'REAS', 'GK', 'MOCK'].forEach(tag => {
+        const done = subjectDone[tag] || 0;
+        const total = subjectTotals[tag] || 1;
+        const pct = Math.round((done / total) * 100);
+        const pctEl = document.getElementById(`subj_${tag}_pct`);
+        const barEl = document.getElementById(`subj_${tag}_bar`);
+        const countEl = document.getElementById(`subj_${tag}_count`);
+
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+        if (countEl) countEl.textContent = `${done} / ${total} tasks`;
+      });
+
+      // Update Phase header dynamically
+      if (completedDays >= 40) {
+        activePhaseBadge.textContent = "Phase 3";
+        activePhaseTitle.textContent = "Final Countdown & Mocks";
+        activePhaseDesc.textContent = "Full-length 60m Tier 1 mocks, speed drills, formula sprints, and error notes.";
+      } else if (completedDays >= 25) {
+        activePhaseBadge.textContent = "Phase 2";
+        activePhaseTitle.textContent = "Advance & Speed Drills";
+        activePhaseDesc.textContent = "Geometry, Mensuration, Trigonometry, DI, and timed 25-question sectional tests.";
+      } else {
+        activePhaseBadge.textContent = "Phase 1";
+        activePhaseTitle.textContent = "Core Foundations";
+        activePhaseDesc.textContent = "Arithmetic core, high-frequency English rules, and Polity/History basics.";
+      }
+    }
+
+    // Render a single slot with its checkbox and YouTube link
+    function renderSlotHTML(day, slotNum, slot, timeLabel, isChecked) {
+      const taskId = `d${day}_s${slotNum}`;
+      const inputId = `task_${taskId}`;
+      const textId = `text_${taskId}`;
+
+      return `
+        <div class="group/slot p-2 rounded-xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
+          <div class="flex items-start gap-2.5">
+            <input 
+              type="checkbox" 
+              id="${inputId}"
+              class="task-check check-bounce mt-0.5 rounded text-indigo-600 focus:ring-0 focus:ring-offset-0 w-4 h-4 cursor-pointer"
+              data-task-id="${taskId}"
+              ${isChecked ? 'checked' : ''}
+            >
+            <label for="${inputId}" class="flex-1 min-w-0 cursor-pointer select-none">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded border ${TAG_CLASSES[slot.tag] || 'bg-slate-100 text-slate-700'}">
+                  ${slot.tag}
+                </span>
+                <span class="text-[10px] text-slate-400 font-medium">${timeLabel}</span>
+              </div>
+              <p id="${textId}" class="text-xs text-slate-700 dark:text-slate-200 font-medium leading-snug ${isChecked ? 'line-through opacity-50' : ''}">
+                ${slot.title}
+              </p>
+            </label>
+          </div>
+          <!-- YouTube Video Learning Link -->
+          <div class="mt-1.5 pl-6.5">
+            <a 
+              href="${slot.videoUrl}" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              onclick="event.stopPropagation()"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 border border-indigo-200/70 dark:border-indigo-800/60 transition group/yt shadow-2xs max-w-full"
+              title="Open lecture on YouTube (New Tab)"
+            >
+              <i data-lucide="play-circle" class="w-3.5 h-3.5 text-rose-500 shrink-0 group-hover/yt:scale-110 transition-transform"></i>
+              <span class="truncate max-w-[210px] sm:max-w-[260px]">${slot.videoLabel || '▶ Watch Lecture'}</span>
+              <i data-lucide="external-link" class="w-3 h-3 text-slate-400 ml-auto opacity-75 shrink-0"></i>
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Cards
+    function renderCards() {
+      cardsContainer.innerHTML = '';
+      
+      const query = currentSearch.toLowerCase().trim();
+      let visibleCount = 0;
+      const todayDayNum = getTodayDayNumber();
+
+      // Find first pending day for fallback in today filter
+      let firstPendingDay = null;
+      for (let i = 0; i < PLAN_DATA.length; i++) {
+        const d = PLAN_DATA[i];
+        if (!(taskState[`d${d.day}_s1`] && taskState[`d${d.day}_s2`] && taskState[`d${d.day}_s3`])) {
+          firstPendingDay = d.day;
+          break;
+        }
+      }
+      if (!firstPendingDay) firstPendingDay = 1;
+
+      PLAN_DATA.forEach(dayItem => {
+        // Filter by Phase
+        if (currentFilter === 'phase1' && dayItem.phase !== 1) return;
+        if (currentFilter === 'phase2' && dayItem.phase !== 2) return;
+        if (currentFilter === 'phase3' && dayItem.phase !== 3) return;
+
+        // "Today" filter logic: matches today's calendar day or the active pending day
+        if (currentFilter === 'today') {
+          const targetDay = todayDayNum || firstPendingDay;
+          if (dayItem.day !== targetDay) return;
+        }
+
+        // Tag Quick Filter
+        if (currentTagFilter !== 'ALL') {
+          const hasTag = dayItem.slot1.tag === currentTagFilter || dayItem.slot2.tag === currentTagFilter || dayItem.slot3.tag === currentTagFilter;
+          if (!hasTag) return;
+        }
+
+        // Search Query filter (checks day number, date, slot titles, tags, and video titles)
+        if (query) {
+          const textCorpus = `${dayItem.day} ${dayItem.dateStr} ${dayItem.slot1.title} ${dayItem.slot2.title} ${dayItem.slot3.title} ${dayItem.slot1.tag} ${dayItem.slot2.tag} ${dayItem.slot3.tag} ${dayItem.slot1.videoLabel || ''} ${dayItem.slot2.videoLabel || ''} ${dayItem.slot3.videoLabel || ''}`.toLowerCase();
+          if (!textCorpus.includes(query)) return;
+        }
+
+        visibleCount++;
+
+        // Status calculation
+        const c1 = !!taskState[`d${dayItem.day}_s1`];
+        const c2 = !!taskState[`d${dayItem.day}_s2`];
+        const c3 = !!taskState[`d${dayItem.day}_s3`];
+        const count = (c1?1:0) + (c2?1:0) + (c3?1:0);
+
+        let statusBadge = '';
+        let cardBorder = 'border-slate-200 dark:border-slate-800';
+
+        if (count === 3) {
+          statusBadge = '<span class="day-status-badge text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Completed</span>';
+          cardBorder = 'border-emerald-300 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/10';
+        } else if (count > 0) {
+          statusBadge = `<span class="day-status-badge text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">In Progress (${count}/3)</span>`;
+          cardBorder = 'border-amber-300 dark:border-amber-900/60 bg-amber-50/15 dark:bg-amber-950/10';
+        } else {
+          statusBadge = '<span class="day-status-badge text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">Pending</span>';
+        }
+
+        const noteText = notesState[`d${dayItem.day}`] || '';
+        const isToday = todayDayNum === dayItem.day;
+
+        // Card HTML
+        const card = document.createElement('div');
+        card.className = `day-card bg-white dark:bg-slate-900 rounded-2xl p-4.5 border ${cardBorder} shadow-sm transition-all duration-200 flex flex-col justify-between hover:shadow-md relative`;
+        card.id = `card_day_${dayItem.day}`;
+
+        card.innerHTML = `
+          <div>
+            <!-- Card Header -->
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg font-mono font-bold text-xs flex items-center justify-center ${dayItem.isSunday ? 'bg-indigo-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200'}">
+                  ${dayItem.day < 10 ? '0' + dayItem.day : dayItem.day}
+                </span>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
+                    Day ${dayItem.day}
+                    ${dayItem.isSunday ? '<span class="text-[10px] uppercase font-semibold text-indigo-600 dark:text-indigo-400 font-sans tracking-wider">Sunday Mock</span>' : ''}
+                    ${isToday ? '<span class="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-300 dark:border-emerald-800 flex items-center gap-1 animate-pulse">● Today</span>' : ''}
+                  </h4>
+                  <span class="text-[11px] text-slate-400 font-medium">${dayItem.dateStr}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <!-- Quick Mark Day All Done Button -->
+                <button 
+                  class="mark-day-all-btn p-1 rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition" 
+                  data-day="${dayItem.day}"
+                  title="${count === 3 ? 'Clear day tasks' : 'Mark all 3 tasks complete'}"
+                  aria-label="Toggle All Day Tasks"
+                >
+                  <i data-lucide="${count === 3 ? 'check-check' : 'check'}" class="w-3.5 h-3.5"></i>
+                </button>
+                <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">P${dayItem.phase}</span>
+                <div id="badge_day_${dayItem.day}">${statusBadge}</div>
+              </div>
+            </div>
+
+            <!-- 3 Tasks Block with YouTube Links -->
+            <div class="mt-3.5 space-y-2.5">
+              ${renderSlotHTML(dayItem.day, 1, dayItem.slot1, "1:45 PM – 2:45 PM", c1)}
+              ${renderSlotHTML(dayItem.day, 2, dayItem.slot2, "6:30 PM – 8:30 PM (Core)", c2)}
+              ${renderSlotHTML(dayItem.day, 3, dayItem.slot3, "9:30 PM – 10:45 PM", c3)}
+            </div>
+          </div>
+
+          <!-- Notes / Error Log Accordion -->
+          <div class="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
+            <details class="group/note">
+              <summary class="text-[11px] font-semibold text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer list-none flex items-center justify-between">
+                <span class="flex items-center gap-1">
+                  <i data-lucide="edit-3" class="w-3 h-3"></i> 
+                  ${noteText ? 'View / Edit Daily Notes' : '+ Add Mock Score or Error Note'}
+                </span>
+                <i data-lucide="chevron-down" class="w-3 h-3 transition-transform group-open/note:rotate-180"></i>
+              </summary>
+              <div class="mt-2">
+                <textarea 
+                  class="day-note-input w-full p-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-400"
+                  rows="2"
+                  data-day="${dayItem.day}"
+                  placeholder="Record wrong questions, score (e.g. 138/200), or tricky formulas..."
+                >${noteText}</textarea>
+                <div class="flex justify-end mt-1">
+                  <span class="text-[10px] text-slate-400 italic">Auto-saves on change</span>
+                </div>
+              </div>
+            </details>
+          </div>
+        `;
+
+        cardsContainer.appendChild(card);
+      });
+
+      // Show/Hide Empty State
+      if (visibleCount === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+      }
+
+      // Re-init lucide icons in newly injected cards
+      lucide.createIcons();
+    }
+
+    // In-place UI update on task check (no full re-render, zero flicker!)
+    function handleTaskCheck(taskId, isChecked) {
+      taskState[taskId] = isChecked;
+      safeSetStorage(STORAGE_KEY_CHECKS, taskState);
+
+      // Update text style
+      const textEl = document.getElementById(`text_${taskId}`);
+      if (textEl) {
+        if (isChecked) {
+          textEl.classList.add('line-through', 'opacity-50');
+        } else {
+          textEl.classList.remove('line-through', 'opacity-50');
+        }
+      }
+
+      // Extract day number
+      const match = taskId.match(/d(\d+)_s(\d)/);
+      if (match) {
+        const day = parseInt(match[1]);
+        const c1 = !!taskState[`d${day}_s1`];
+        const c2 = !!taskState[`d${day}_s2`];
+        const c3 = !!taskState[`d${day}_s3`];
+        const count = (c1?1:0) + (c2?1:0) + (c3?1:0);
+
+        const card = document.getElementById(`card_day_${day}`);
+        const badgeContainer = document.getElementById(`badge_day_${day}`);
+
+        if (badgeContainer) {
+          if (count === 3) {
+            badgeContainer.innerHTML = '<span class="day-status-badge text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300 flex items-center gap-1"><i data-lucide="check" class="w-3 h-3"></i> Completed</span>';
+            if (card) {
+              card.className = `day-card bg-white dark:bg-slate-900 rounded-2xl p-4.5 border border-emerald-300 dark:border-emerald-900/60 bg-emerald-50/20 dark:bg-emerald-950/10 shadow-sm transition-all duration-200 flex flex-col justify-between hover:shadow-md relative`;
+            }
+          } else if (count > 0) {
+            badgeContainer.innerHTML = `<span class="day-status-badge text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">In Progress (${count}/3)</span>`;
+            if (card) {
+              card.className = `day-card bg-white dark:bg-slate-900 rounded-2xl p-4.5 border border-amber-300 dark:border-amber-900/60 bg-amber-50/15 dark:bg-amber-950/10 shadow-sm transition-all duration-200 flex flex-col justify-between hover:shadow-md relative`;
+            }
+          } else {
+            badgeContainer.innerHTML = '<span class="day-status-badge text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">Pending</span>';
+            if (card) {
+              card.className = `day-card bg-white dark:bg-slate-900 rounded-2xl p-4.5 border border-slate-200 dark:border-slate-800 shadow-sm transition-all duration-200 flex flex-col justify-between hover:shadow-md relative`;
+            }
+          }
+          lucide.createIcons();
+        }
+      }
+
+      updateProgress();
+
+      if (isChecked) {
+        showToast("Session marked complete! Great progress.", "success");
+      }
+    }
+
+    // Toggle all 3 tasks for a day
+    function toggleDayAll(day) {
+      const c1 = !!taskState[`d${day}_s1`];
+      const c2 = !!taskState[`d${day}_s2`];
+      const c3 = !!taskState[`d${day}_s3`];
+      const allDone = c1 && c2 && c3;
+      const targetState = !allDone;
+
+      ['s1', 's2', 's3'].forEach(s => {
+        const taskId = `d${day}_${s}`;
+        taskState[taskId] = targetState;
+        const cb = document.querySelector(`input[data-task-id="${taskId}"]`);
+        if (cb) cb.checked = targetState;
+        const textEl = document.getElementById(`text_${taskId}`);
+        if (textEl) {
+          if (targetState) textEl.classList.add('line-through', 'opacity-50');
+          else textEl.classList.remove('line-through', 'opacity-50');
+        }
+      });
+
+      safeSetStorage(STORAGE_KEY_CHECKS, taskState);
+      updateProgress();
+      renderCards();
+
+      showToast(targetState ? `Day ${day} completed! Keep up the momentum.` : `Day ${day} tasks reset.`, targetState ? 'success' : 'info');
+    }
+
+    // Attach Event Handlers
+    function setupEventListeners() {
+      
+      // Checkbox changes (delegation)
+      cardsContainer.addEventListener('change', (e) => {
+        if (e.target.matches('.task-check')) {
+          const taskId = e.target.getAttribute('data-task-id');
+          handleTaskCheck(taskId, e.target.checked);
+        }
+      });
+
+      // Mark Day All Button (delegation)
+      cardsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mark-day-all-btn');
+        if (btn) {
+          const day = parseInt(btn.getAttribute('data-day'));
+          toggleDayAll(day);
+        }
+      });
+
+      // Note input updates (auto-save)
+      cardsContainer.addEventListener('input', (e) => {
+        if (e.target.matches('.day-note-input')) {
+          const day = e.target.getAttribute('data-day');
+          notesState[`d${day}`] = e.target.value;
+          safeSetStorage(STORAGE_KEY_NOTES, notesState);
+        }
+      });
+
+      // Filter Tabs
+      document.getElementById('phaseFilterContainer').addEventListener('click', (e) => {
+        const btn = e.target.closest('.phase-btn');
+        if (!btn) return;
+
+        document.querySelectorAll('.phase-btn').forEach(b => {
+          b.classList.remove('active', 'bg-slate-900', 'text-white', 'dark:bg-indigo-600');
+          b.classList.add('text-slate-600', 'dark:text-slate-300');
+        });
+
+        btn.classList.add('active', 'bg-slate-900', 'text-white', 'dark:bg-indigo-600');
+        btn.classList.remove('text-slate-600', 'dark:text-slate-300');
+
+        currentFilter = btn.getAttribute('data-filter');
+        renderCards();
+      });
+
+      // Search Filter
+      searchInput.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        if (currentSearch.length > 0) {
+          clearSearchBtn.classList.remove('hidden');
+        } else {
+          clearSearchBtn.classList.add('hidden');
+        }
+        renderCards();
+      });
+
+      clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        currentSearch = '';
+        clearSearchBtn.classList.add('hidden');
+        renderCards();
+        searchInput.focus();
+      });
+
+      // Quick Tag filters in filter bar
+      document.querySelectorAll('.tag-quick-filter').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentTagFilter = btn.getAttribute('data-tag');
+          renderCards();
+          showToast(`Filtered by tag: ${currentTagFilter}`, "info");
+        });
+      });
+
+      // Subject Cards in Subject Progress Section
+      document.querySelectorAll('.subject-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tag = btn.getAttribute('data-tag');
+          currentTagFilter = tag;
+          renderCards();
+          showToast(`Filtered to ${tag} subject tasks`, "info");
+          cardsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      // Export Progress as JSON download
+      document.getElementById('exportBtn').addEventListener('click', () => {
+        const report = {
+          exportDate: new Date().toISOString(),
+          examTarget: "SSC CHSL Tier 1 2026",
+          totalTasks: PLAN_DATA.length * 3,
+          tasksCompleted: Object.values(taskState).filter(Boolean).length,
+          tasks: taskState,
+          notes: notesState
+        };
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(report, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `SSC_CHSL_Progress_${new Date().toLocaleDateString('en-GB').replace(/\//g, '-')}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+
+        showToast("Progress backup downloaded successfully!");
+      });
+
+      // Import / Restore from JSON
+      importBtn.addEventListener('click', () => {
+        importFileInput.click();
+      });
+
+      importFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const parsed = JSON.parse(event.target.result);
+            if (parsed && typeof parsed.tasks === 'object') {
+              taskState = parsed.tasks || {};
+              notesState = parsed.notes || {};
+              safeSetStorage(STORAGE_KEY_CHECKS, taskState);
+              safeSetStorage(STORAGE_KEY_NOTES, notesState);
+
+              updateProgress();
+              renderCards();
+              showToast("Progress restored from backup successfully!", "success");
+            } else {
+              showToast("Invalid JSON backup format.", "info");
+            }
+          } catch (err) {
+            showToast("Failed to read JSON backup file.", "info");
+          }
+        };
+        reader.readAsText(file);
+        importFileInput.value = '';
+      });
+
+      // Reset Modal Logic
+      const openResetBtn = document.getElementById('openResetBtn');
+      const cancelModalBtn = document.getElementById('cancelModalBtn');
+      const confirmModalBtn = document.getElementById('confirmModalBtn');
+
+      openResetBtn.addEventListener('click', () => {
+        confirmModal.classList.remove('hidden');
+        confirmModal.classList.add('flex');
+      });
+
+      cancelModalBtn.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+        confirmModal.classList.remove('flex');
+      });
+
+      confirmModalBtn.addEventListener('click', () => {
+        taskState = {};
+        notesState = {};
+        try {
+          localStorage.removeItem(STORAGE_KEY_CHECKS);
+          localStorage.removeItem(STORAGE_KEY_NOTES);
+        } catch(e) {}
+
+        confirmModal.classList.add('hidden');
+        confirmModal.classList.remove('flex');
+
+        updateProgress();
+        renderCards();
+        showToast("Progress reset successfully.", "info");
+      });
+
+      // Dark Mode Toggle
+      const themeToggle = document.getElementById('themeToggle');
+      
+      // Init theme
+      const storedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+      if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      themeToggle.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          safeSetStorage(STORAGE_KEY_THEME, 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          safeSetStorage(STORAGE_KEY_THEME, 'dark');
+        }
+        lucide.createIcons();
+      });
+
+    }
+
+    // Startup Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      updateProgress();
+      renderCards();
+      setupEventListeners();
+    });
+
+  </script>
+</body>
+</html>
